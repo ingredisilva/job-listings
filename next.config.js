@@ -1,4 +1,7 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 /** @type {import('next').NextConfig} */
+const path = require('path');
+const withImages = require('next-images');
 const nextConfig = {
   eslint: {
     dirs: ['src'],
@@ -33,5 +36,12 @@ const nextConfig = {
     return config;
   },
 };
+
+module.exports = withImages({
+  exclude: path.resolve(__dirname, 'src/assets/svg'),
+  webpack(config) {
+    return config;
+  },
+});
 
 module.exports = nextConfig;

@@ -1,8 +1,12 @@
 import * as React from 'react';
 
-import Header from '@/components/layout/Header';
+import HeaderCom from '@/components/HeaderCom';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  <Header />;
-  return <>{children}</>;
+  return (
+    <>
+      <HeaderCom />
+      {children}
+    </>
+  );
 }
