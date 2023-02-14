@@ -9,7 +9,7 @@ import HeaderCom from '@/components/HeaderCom';
 
 export default function Header() {
   return (
-    <header className='bg-white'>
+    <header className=''>
       <HeaderCom />
     </header>
   );
