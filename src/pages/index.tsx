@@ -1,5 +1,6 @@
 import * as React from 'react';
 
+import JobCards from '@/components/JobCards';
 import Layout from '@/components/layout/Layout';
 import Seo from '@/components/Seo';
 
@@ -10,7 +11,9 @@ export default function HomePage() {
       <Seo />
 
       <main>
-        <section className='bg-white'></section>
+        <section className='bg-blue-50'>
+          <JobCards />
+        </section>
       </main>
     </Layout>
   );
