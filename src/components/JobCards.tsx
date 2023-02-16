@@ -1,9 +1,10 @@
+/* eslint-disable unused-imports/no-unused-vars */
 import Data from 'data.json';
-import Image from 'next/image';
+import Image, { StaticImageData } from 'next/image';
 import React, { useState } from 'react';
 import theme from 'tailwind.config';
 
-/* interface jobs {
+interface jobs {
   id: number;
   company: string;
   logo: StaticImageData;
@@ -18,8 +19,9 @@ import theme from 'tailwind.config';
   languages: [];
   tools: [];
 }
- */
+
 function JobCards() {
+  /*   const [data, setData] = useState<jobs>(); */
   const [search, setSearch] = useState('');
   /*   const [q, setQ] = useState('');
   const [searchParam] = useState([
@@ -30,6 +32,7 @@ function JobCards() {
     'level',
   ]);
  */
+
   return (
     <div className='m-4 flex flex-col items-center gap-4'>
       <div>filter</div>
@@ -38,7 +41,7 @@ function JobCards() {
         value={search}
         onChange={(e) => setSearch(e.target.value)}
       />
-      {Data.map((jobs) => {
+      {Data?.map((jobs) => {
         return (
           <>
             <div
