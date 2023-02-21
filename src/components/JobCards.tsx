@@ -6,7 +6,6 @@ import axios from 'axios';
 import { StaticImageData } from 'next/image';
 import React, { useEffect, useState } from 'react';
 
-import Filter from '@/components/Filter';
 import GetJobs from '@/components/GetJobs';
 
 interface btnFilters {
@@ -30,6 +29,12 @@ export interface Jobs {
   tools: [];
 }
 const jobs: Jobs[] = [];
+
+const levels = ['junior', 'senior'];
+enum Langs {
+  JAVASCRIPT = 'javascript',
+  PYTHON = 'python',
+}
 
 function JobCards() {
   /*   const [search, setSearch] = React.useState(''); */
@@ -76,20 +81,20 @@ function JobCards() {
       setMenuItem(jobs);
       return;
     } */
-    const newItems = menuItem;
-    const filteredData = newItems.filter(
-      (item) => item.level.toLowerCase() === button
-    );
 
-    setItemsForFilter(filteredData);
+    if (levels.includes(button.toLocaleLowerCase())) {
+      const newItems = menuItem;
+      const filteredData = newItems.filter(
+        (item) => item.level.toLowerCase() === button.toLocaleLowerCase()
+      );
+
+      setItemsForFilter(filteredData);
+    }
   };
 
   return (
     <div className='m-4 flex flex-col items-center gap-4'>
       <div>filter</div>
-      <div>
-        <Filter button={buttons} filter={filter} />
-      </div>
 
       <div></div>
 
@@ -100,7 +105,7 @@ function JobCards() {
         >
           {!loading && itemsForFilter
             ? itemsForFilter.map((item) => (
-                <GetJobs menuItem={item} key={item.id} />
+                <GetJobs menuItem={item} key={item.id} filter={filter} />
               ))
             : '...Loading'}
         </div>
