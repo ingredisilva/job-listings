@@ -7,7 +7,7 @@ import { StaticImageData } from 'next/image';
 import React, { useEffect, useState } from 'react';
 
 import Filter from '@/components/Filter';
-//import GetJobs from '@/components/GetJobs';
+import GetJobs from '@/components/GetJobs';
 
 interface btnFilters {
   name: string;
@@ -32,9 +32,10 @@ export interface Jobs {
 const jobs: Jobs[] = [];
 
 function JobCards() {
-  const [search, setSearch] = React.useState('');
+  /*   const [search, setSearch] = React.useState(''); */
   const [menuItem, setMenuItem]: [Jobs[], (jobs: Jobs[]) => void] =
     React.useState(jobs);
+  const [itemsForFilter, setItemsForFilter] = useState<Array<Jobs>>();
   const [buttons, setButtons] = useState<string[]>([]);
   const [loading, setLoading]: [boolean, (loading: boolean) => void] =
     React.useState<boolean>(true);
@@ -53,15 +54,14 @@ function JobCards() {
       )
       .then((Response) => {
         setMenuItem(Response.data);
+        setItemsForFilter(Response.data);
         setLoading(false);
       });
   }, []);
 
-  /*   if (!loading) {
-    return 'Loading...';
-  } */
+  /*  const filters = ['position', 'location', 'contract', 'tools', 'level']; */
 
-  const filters = ['position', 'location', 'contract', 'tools', 'level'];
+  const filters = ['Junior', 'Midweight', 'Senior'];
 
   /*  const handleFilter = getJobs.filter((filterItems) => {
     if (filterItems === btnFilter.name) {
@@ -69,20 +69,27 @@ function JobCards() {
     }
     return <Filter buttonName={btnFilter.n} />;
   }); */
-  const allCategories = ['All', ...new Set(jobs.map((item) => item))];
+  /*  const allCategories = ['All', ...new Set(jobs.map((item) => item))]; */
+
   const filter = (button: string) => {
-    if (button === 'All') {
+    /*   if (button === 'All') {
       setMenuItem(jobs);
       return;
-    }
+    } */
+    const newItems = menuItem;
+    const filteredData = newItems.filter(
+      (item) => item.level.toLowerCase() === button
+    );
 
-    const filteredData = jobs.filter((item) => item.contract === button);
-    setMenuItem(filteredData);
+    setItemsForFilter(filteredData);
   };
 
   return (
     <div className='m-4 flex flex-col items-center gap-4'>
       <div>filter</div>
+      <div>
+        <Filter button={buttons} filter={filter} />
+      </div>
 
       <div></div>
 
@@ -91,10 +98,11 @@ function JobCards() {
           className='flex flex-wrap justify-between gap-4 rounded border-l-4 border-l-jbprimary
                  bg-slate-50 p-4 shadow-sm shadow-jbprimary sm:w-full sm:flex-col  md:w-2/3  md:flex-row'
         >
-          {/* <GetJobs menuItem={menuItem} /> */}
-          <div>
-            <Filter onClick={filter} button={buttons} filter={() => filter} />
-          </div>
+          {!loading && itemsForFilter
+            ? itemsForFilter.map((item) => (
+                <GetJobs menuItem={item} key={item.id} />
+              ))
+            : '...Loading'}
         </div>
       </>
 
