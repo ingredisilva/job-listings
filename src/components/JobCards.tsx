@@ -1,10 +1,20 @@
 /* eslint-disable unused-imports/no-unused-vars */
-import Data from 'data.json';
-import Image, { StaticImageData } from 'next/image';
-import React, { useState } from 'react';
-import theme from 'tailwind.config';
 
-interface jobs {
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+/*@ts-ignore */
+import axios from 'axios';
+import { StaticImageData } from 'next/image';
+import React, { useEffect, useState } from 'react';
+
+import Filter from '@/components/Filter';
+//import GetJobs from '@/components/GetJobs';
+
+interface btnFilters {
+  name: string;
+  type: string;
+}
+export interface Jobs {
+  type: string;
   id: number;
   company: string;
   logo: StaticImageData;
@@ -19,87 +29,76 @@ interface jobs {
   languages: [];
   tools: [];
 }
+const jobs: Jobs[] = [];
 
 function JobCards() {
-  /*   const [data, setData] = useState<jobs>(); */
-  const [search, setSearch] = useState('');
-  /*   const [q, setQ] = useState('');
-  const [searchParam] = useState([
-    'position',
-    'contract',
-    'location',
-    'tools',
-    'level',
-  ]);
- */
+  const [search, setSearch] = React.useState('');
+  const [menuItem, setMenuItem]: [Jobs[], (jobs: Jobs[]) => void] =
+    React.useState(jobs);
+  const [buttons, setButtons] = useState<string[]>([]);
+  const [loading, setLoading]: [boolean, (loading: boolean) => void] =
+    React.useState<boolean>(true);
+  const [error, setError]: [string, (error: string) => void] =
+    React.useState('');
+
+  useEffect(() => {
+    axios
+      .get<Jobs[]>(
+        'https://my-json-server.typicode.com/ingredisilva/dbjobs/jobs',
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      )
+      .then((Response) => {
+        setMenuItem(Response.data);
+        setLoading(false);
+      });
+  }, []);
+
+  /*   if (!loading) {
+    return 'Loading...';
+  } */
+
+  const filters = ['position', 'location', 'contract', 'tools', 'level'];
+
+  /*  const handleFilter = getJobs.filter((filterItems) => {
+    if (filterItems === btnFilter.name) {
+      return;
+    }
+    return <Filter buttonName={btnFilter.n} />;
+  }); */
+  const allCategories = ['All', ...new Set(jobs.map((item) => item))];
+  const filter = (button: string) => {
+    if (button === 'All') {
+      setMenuItem(jobs);
+      return;
+    }
+
+    const filteredData = jobs.filter((item) => item.contract === button);
+    setMenuItem(filteredData);
+  };
 
   return (
     <div className='m-4 flex flex-col items-center gap-4'>
       <div>filter</div>
-      <input
-        type='search'
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-      />
-      {Data?.map((jobs) => {
-        return (
-          <>
-            <div
-              className='flex flex-wrap justify-between gap-4 rounded border-l-4 border-l-jbprimary bg-slate-50 p-4 shadow-sm shadow-jbprimary sm:w-full sm:flex-col  md:w-2/3  md:flex-row'
-              key={jobs.id}
-            >
-              <div className='sm:w-sm flex flex-wrap gap-4 p-2 sm:flex-col md:flex-row'>
-                <span>
-                  {theme.screen === 'sm' ? (
-                    <Image
-                      src={jobs.logo}
-                      alt='companyName'
-                      width={30}
-                      height={30}
-                      className='w-sm'
-                    />
-                  ) : (
-                    <Image
-                      src={jobs.logo}
-                      alt='companyName'
-                      width={100}
-                      height={100}
-                      className='w-lg'
-                    />
-                  )}
-                </span>
 
-                <div className='flex flex-col flex-wrap gap-4'>
-                  <span className='flex items-center gap-2 '>
-                    <p>j{jobs.company}</p>
-                    <span className='mx-2 rounded-full bg-jbprimary'>
-                      <p className='mx-2 '> New!</p>
-                    </span>
-                    <span>Featured</span>
-                  </span>
-                  <span className='font-bold'>
-                    <p>{jobs.role}</p>
-                  </span>
-                  <span className='flex gap-2 text-gray-400'>
-                    <li className='text-xs'>1day ago</li>
-                    <li className='text-xs'>{jobs.contract}</li>
-                    <li className='text-xs'>País</li>
-                  </span>
-                  <hr />
-                </div>
-              </div>{' '}
-              <div>
-                <button className='rounded bg-teal-400 text-jbprimary'>
-                  <p className='z-10 mx-2 border-none p-1 font-bold text-slate-50'>
-                    {' '}
-                    Front End
-                  </p>
-                </button>
-              </div>
-            </div>
-          </>
-        );
-      })}
+      <div></div>
+
+      <>
+        <div
+          className='flex flex-wrap justify-between gap-4 rounded border-l-4 border-l-jbprimary
+                 bg-slate-50 p-4 shadow-sm shadow-jbprimary sm:w-full sm:flex-col  md:w-2/3  md:flex-row'
+        >
+          {/* <GetJobs menuItem={menuItem} /> */}
+          <div>
+            <Filter onClick={filter} button={buttons} filter={() => filter} />
+          </div>
+        </div>
+      </>
+
+      {error && <p className='text-red-600'>{error}</p>}
     </div>
   );
 }
