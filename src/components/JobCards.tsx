@@ -1,13 +1,20 @@
 /* eslint-disable unused-imports/no-unused-vars */
+
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+/*@ts-ignore */
 import axios from 'axios';
-import Image, { StaticImageData } from 'next/image';
-import React, { useEffect } from 'react';
+import { StaticImageData } from 'next/image';
+import React, { useEffect, useState } from 'react';
+
+import Filter from '@/components/Filter';
+//import GetJobs from '@/components/GetJobs';
 
 interface btnFilters {
   name: string;
-  value: string;
+  type: string;
 }
 export interface Jobs {
+  type: string;
   id: number;
   company: string;
   logo: StaticImageData;
@@ -26,8 +33,9 @@ const jobs: Jobs[] = [];
 
 function JobCards() {
   const [search, setSearch] = React.useState('');
-  const [getJobs, setGetJobs]: [Jobs[], (jobs: Jobs[]) => void] =
+  const [menuItem, setMenuItem]: [Jobs[], (jobs: Jobs[]) => void] =
     React.useState(jobs);
+  const [buttons, setButtons] = useState<string[]>([]);
   const [loading, setLoading]: [boolean, (loading: boolean) => void] =
     React.useState<boolean>(true);
   const [error, setError]: [string, (error: string) => void] =
@@ -44,94 +52,52 @@ function JobCards() {
         }
       )
       .then((Response) => {
-        setGetJobs(Response.data);
+        setMenuItem(Response.data);
         setLoading(false);
       });
   }, []);
 
-  const btnFilters = [
-    {
-      name: 'Position',
-      value: 'position',
-    },
-    { name: 'Contract', value: 'contract' },
-    {
-      name: 'Location',
-      value: 'location',
-    },
-    {
-      name: 'Tools',
-      value: 'tools',
-    },
-    {
-      name: 'Level',
-      value: 'level',
-    },
-  ];
+  /*   if (!loading) {
+    return 'Loading...';
+  } */
 
-  const filter = [];
+  const filters = ['position', 'location', 'contract', 'tools', 'level'];
+
+  /*  const handleFilter = getJobs.filter((filterItems) => {
+    if (filterItems === btnFilter.name) {
+      return;
+    }
+    return <Filter buttonName={btnFilter.n} />;
+  }); */
+  const allCategories = ['All', ...new Set(jobs.map((item) => item))];
+  const filter = (button: string) => {
+    if (button === 'All') {
+      setMenuItem(jobs);
+      return;
+    }
+
+    const filteredData = jobs.filter((item) => item.contract === button);
+    setMenuItem(filteredData);
+  };
 
   return (
     <div className='m-4 flex flex-col items-center gap-4'>
       <div>filter</div>
-      <input
-        type='search'
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-      />
-      {getJobs.map((items) => {
-        return (
-          <>
-            <div
-              className='flex flex-wrap justify-between gap-4 rounded border-l-4 border-l-jbprimary bg-slate-50 p-4 shadow-sm shadow-jbprimary sm:w-full sm:flex-col  md:w-2/3  md:flex-row'
-              key={items.id}
-            >
-              <div className='sm:w-sm flex flex-wrap gap-4 p-2 sm:flex-col md:flex-row'>
-                <span>
-                  <Image
-                    src={items.logo}
-                    alt='companyName'
-                    width={30}
-                    height={30}
-                    className='w-sm'
-                  />
-                </span>
 
-                <div className='flex flex-col flex-wrap gap-4'>
-                  <span className='flex items-center gap-2 '>
-                    <p>{items.company}</p>
-                    <span className='mx-2 rounded-full bg-jbprimary'>
-                      <p className='mx-2 '> New!</p>
-                    </span>
-                    <span>Featured</span>
-                  </span>
-                  <span className='font-bold'>
-                    <p>{items.role}</p>
-                  </span>
-                  <span className='flex gap-2 text-gray-400'>
-                    <li className='text-xs'>{items.postedAt}</li>
-                    <li className='text-xs'>{items.contract}</li>
-                    <li className='text-xs'>País</li>
-                  </span>
-                  <hr />
-                </div>
-              </div>{' '}
-              <div>
-                {/*  {btnFilters.map((btn) => {
-                    return (
-                      <Filter
-                        onClick={handleFilter}
-                        buttonName={btn.name}
-                        value={btn.value}
-                        key={items.id}
-                      />
-                    );
-                  })} */}
-              </div>
-            </div>
-          </>
-        );
-      })}
+      <div></div>
+
+      <>
+        <div
+          className='flex flex-wrap justify-between gap-4 rounded border-l-4 border-l-jbprimary
+                 bg-slate-50 p-4 shadow-sm shadow-jbprimary sm:w-full sm:flex-col  md:w-2/3  md:flex-row'
+        >
+          {/* <GetJobs menuItem={menuItem} /> */}
+          <div>
+            <Filter onClick={filter} button={buttons} filter={() => filter} />
+          </div>
+        </div>
+      </>
+
       {error && <p className='text-red-600'>{error}</p>}
     </div>
   );
