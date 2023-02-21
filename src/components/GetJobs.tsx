@@ -1,6 +1,8 @@
 import Image, { StaticImageData } from 'next/image';
 import React from 'react';
 
+import Filter from '@/components/Filter';
+
 type Props = {
   menuItem: {
     type: string;
@@ -18,9 +20,11 @@ type Props = {
     languages: [];
     tools: [];
   };
+
+  filter: (value: string) => void;
 };
 
-function GetJobs({ menuItem }: Props) {
+function GetJobs({ menuItem, filter }: Props) {
   return (
     <div className='sm:w-sm flex flex-wrap gap-4 p-2 sm:flex-col md:flex-row'>
       <span>
@@ -50,6 +54,8 @@ function GetJobs({ menuItem }: Props) {
         </span>
       </div>
       <hr />
+
+      <Filter buttonsItems={menuItem} filter={filter} />
     </div>
   );
 }
