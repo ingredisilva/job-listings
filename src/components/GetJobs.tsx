@@ -1,63 +1,73 @@
-import Image, { StaticImageData } from 'next/image';
-import React from 'react';
+import Image from 'next/image';
 
-import Filter from '@/components/Filter';
+import Filters from '@/components/Filter';
+import { Job } from '@/components/JobCards';
+interface GetJobsProps {
+  menuItem: Job;
+  filter: (button: string) => void;
+  activeButton: string[];
+}
 
-type Props = {
-  menuItem: {
-    type: string;
-    id: number;
-    company: string;
-    logo: StaticImageData;
-    new: boolean;
-    featured: boolean;
-    position: string;
-    role: string;
-    level: string;
-    postedAt: string;
-    contract: string;
-    location: string;
-    languages: [];
-    tools: [];
-  };
+const GetJobs = ({ menuItem, filter, activeButton }: GetJobsProps) => {
+  const {
+    company,
 
-  filter: (value: string) => void;
-};
+    new: newJob,
+    featured,
+    position,
+    level,
+    postedAt,
+    contract,
+    location,
+    languages,
+    tools,
+  } = menuItem;
 
-function GetJobs({ menuItem, filter }: Props) {
+  const allButtons = [level, ...languages, ...tools];
+
   return (
-    <div className='sm:w-sm flex flex-wrap gap-4 p-2 sm:flex-col md:flex-row'>
-      <span>
-        <Image
-          src={menuItem.logo}
-          alt='companyName'
-          width={30}
-          height={30}
-          className='w-sm'
-        />
-      </span>
-      <div className='flex flex-col flex-wrap gap-4'>
-        <span className='flex items-center gap-2 '>
-          <p>{menuItem.company}</p>
-          <span className='mx-2 rounded-full bg-jbprimary'>
-            <p className='mx-2 '>{menuItem.new}</p>
-          </span>
-          <span>{menuItem.featured}</span>
-        </span>
-        <span className='font-bold'>
-          <p>{menuItem.role}</p>
-        </span>
-        <span className='flex gap-2 text-gray-400'>
-          <li className='text-xs'>{menuItem.postedAt}</li>
-          <li className='text-xs'>{menuItem.contract}</li>
-          <li className='text-xs'>{menuItem.location}</li>
-        </span>
+    <div className='layout bg-jbprimary-light shadow-jbprimary-light m-2 flex w-full  gap-4 rounded-lg  border-l-8 border-l-jbprimary bg-slate-50 p-4 shadow-lg sm:flex-grow-0'>
+      <div className='flex w-full flex-wrap items-center justify-between gap-4 p-6'>
+        <div className='flex-shrink-0'>
+          <Image src={menuItem.logo} alt={company} width={100} height={100} />
+        </div>
+        <div className='flex-grow'>
+          <div className='flex items-center gap-4'>
+            <p className='font-bold text-jbprimary'>{company}</p>
+            {newJob && (
+              <span className='bg-jbprimary-light rounded-full py-1 px-2 font-bold text-jbprimary'>
+                NEW!
+              </span>
+            )}
+            {featured && (
+              <span className='rounded-full bg-jbprimary py-1 px-2 font-bold text-slate-50'>
+                FEATURED
+              </span>
+            )}
+          </div>
+          <p className='my-2 text-lg font-bold'>{position}</p>
+          <div className='flex items-center gap-2'>
+            <p>{postedAt}</p>
+            <span>&middot;</span>
+            <p>{contract}</p>
+            <span>&middot;</span>
+            <p>{location}</p>
+          </div>
+        </div>
+        <div className='flex-end flex flex-wrap gap-4'>
+          {allButtons.map((button) => (
+            <Filters
+              key={button}
+              buttonValue={button}
+              filter={filter}
+              active={activeButton.includes(button)}
+            />
+          ))}
+        </div>
       </div>
-      <hr />
-
-      <Filter buttonsItems={menuItem} filter={filter} />
+      <hr className='my-4' />
     </div>
   );
-}
+};
 
 export default GetJobs;

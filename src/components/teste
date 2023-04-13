@@ -1,0 +1,118 @@
+function JobCards() {
+  const [activeButton, setActiveButton] = useState<string[]>([]);
+  const [menuItem, setMenuItem]: [Jobs[], (jobs: Jobs[]) => void] =
+    React.useState(jobs);
+  const [itemsForFilter, setItemsForFilter] = useState<Array<Jobs>>();
+  const [buttons, setButtons] = useState<string[]>([]);
+  const [loading, setLoading]: [boolean, (loading: boolean) => void] =
+    React.useState<boolean>(true);
+  const [error, setError]: [string, (error: string) => void] =
+    React.useState('');
+
+  useEffect(() => {
+    axios
+      .get<Jobs[]>(
+        'https://my-json-server.typicode.com/ingredisilva/dbjobs/jobs',
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      )
+      .then((Response) => {
+        setMenuItem(Response.data);
+        setItemsForFilter(Response.data);
+        setLoading(false);
+      });
+  }, []);
+
+  const filter = (button: string) => {
+    const lowercaseButton = button.toLowerCase();
+
+    const filteredData = menuItem.filter((item: MenuItem) => {
+      const lowercaseLanguages = item.languages.map((language) =>
+        language.toLowerCase()
+      );
+
+      return (
+        item.level.toLowerCase() === lowercaseButton ||
+        lowercaseLanguages.some((language) => language === lowercaseButton)
+      );
+    });
+
+    setItemsForFilter(filteredData);
+    setActiveButton((prevActiveFilters) =>
+      prevActiveFilters.includes(button)
+        ? prevActiveFilters.filter((filter) => filter !== button)
+        : [...prevActiveFilters, button]
+    );
+  };
+
+  const removeButton = (filter: string) => {
+    setActiveButton((prevActiveFilters) =>
+      prevActiveFilters.filter((item) => item !== filter)
+    );
+  };
+
+  const allFiltersActive = activeButton.length === levels.length + Langs.length;
+
+  return (
+    <div className='max-w-screen-lg mx-auto px-4'>
+      <div className='flex flex-col md:flex-row justify-between items-center'>
+        <div className='flex flex-wrap gap-4'>
+          {levels.map((level) => (
+            <Filters
+              key={level}
+              buttonValue={level}
+              filter={filter}
+              active={activeButton.includes(level)}
+            />
+          ))}
+          {Langs.map((lang) => (
+            <Filters
+              key={lang}
+              buttonValue={lang}
+              filter={filter}
+              active={activeButton.includes(lang)}
+            />
+          ))}
+        </div>
+        <div className='flex gap-2 mt-4 md:mt-0'>
+          {allFiltersActive ? (
+            <button className='font-bold text-red-600' disabled>
+              All filters active
+            </button>
+          ) : (
+            <button
+              className={`flex gap-2 rounded bg-jbprimary text-slate-50 p-2 font-bold ${
+                activeButton.length > 0 ? '' : 'opacity-50 cursor-not-allowed'
+              }`}
+              onClick={() => setActiveButton([])}
+              disabled={activeButton.length === 0}
+            >
+              <span>Clear filters</span</button>
+          )}
+        </div>
+      </div>
+      {activeButton.length > 0 && (
+        <ActiveFilters filters={activeButton} onFilterRemove={removeButton} />
+      )}
+      <div className='grid gap-6 mt-6 md:grid-cols-2 lg:grid-cols-3'>
+        {!loading && itemsForFilter ? (
+          itemsForFilter.map((item) => (
+            <GetJobs
+              key={item.id}
+              menuItem={item}
+              filter={filter}
+              activeButton={activeButton}
+            />
+          ))
+        ) : (
+          <p className='text-center text-gray-500'>Loading...</p>
+        )}
+      </div>
+      {error && <p className='text-red-600'>{error}</p>}
+    </div>
+  );
+}
+export default JobCards;

@@ -7,12 +7,12 @@ import { StaticImageData } from 'next/image';
 import React, { useEffect, useState } from 'react';
 
 import GetJobs from '@/components/GetJobs';
-
-interface btnFilters {
-  name: string;
-  type: string;
+interface MenuItem {
+  level: string;
+  languages: string[];
 }
-export interface Jobs {
+
+export interface Job {
   type: string;
   id: number;
   company: string;
@@ -25,31 +25,60 @@ export interface Jobs {
   postedAt: string;
   contract: string;
   location: string;
-  languages: [];
-  tools: [];
+  languages: string[];
+  tools: string[];
 }
-const jobs: Jobs[] = [];
 
-const levels = ['junior', 'senior'];
-enum Langs {
-  JAVASCRIPT = 'javascript',
-  PYTHON = 'python',
+const Jobs: Job[] = [];
+
+const levels = ['junior', 'midweight', 'senior'];
+const langs = ['javascript', 'python', 'css'];
+interface ActiveFiltersProps {
+  filters: string[];
+  onFilterRemove: (filter: string) => void;
 }
+
+const ActiveFilters = ({ filters, onFilterRemove }: ActiveFiltersProps) => {
+  const handleFilterRemove = (filter: string) => {
+    onFilterRemove(filter);
+  };
+
+  return (
+    <div className='layout relative top-[-22px] flex w-full justify-between rounded-lg border border-primary-50 bg-slate-50 p-4 shadow-lg'>
+      <div className='mx-4 flex flex-wrap gap-4'>
+        {filters.map((filter) => (
+          <button
+            key={filter}
+            className='flex items-center gap-2 rounded bg-green-50 p-2 font-bold text-teal-200'
+            onClick={() => handleFilterRemove(filter)}
+          >
+            <span>{filter}</span>
+            <span className='flex h-full w-full items-center rounded-r bg-[#5CA5A5]'>
+              x
+            </span>
+          </button>
+        ))}
+      </div>
+      <button
+        className='font-bold hover:underline'
+        onClick={() => handleFilterRemove}
+      >
+        Limpar
+      </button>
+    </div>
+  );
+};
 
 function JobCards() {
-  /*   const [search, setSearch] = React.useState(''); */
-  const [menuItem, setMenuItem]: [Jobs[], (jobs: Jobs[]) => void] =
-    React.useState(jobs);
-  const [itemsForFilter, setItemsForFilter] = useState<Array<Jobs>>();
-  const [buttons, setButtons] = useState<string[]>([]);
-  const [loading, setLoading]: [boolean, (loading: boolean) => void] =
-    React.useState<boolean>(true);
-  const [error, setError]: [string, (error: string) => void] =
-    React.useState('');
+  const [activeButton, setActiveButton] = useState<string[]>([]);
+  const [menuItem, setMenuItem] = useState<Job[]>(Jobs);
+  const [itemsForFilter, setItemsForFilter] = useState<Job[]>();
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string>('');
 
   useEffect(() => {
     axios
-      .get<Jobs[]>(
+      .get<Job[]>(
         'https://my-json-server.typicode.com/ingredisilva/dbjobs/jobs',
         {
           headers: {
@@ -57,60 +86,62 @@ function JobCards() {
           },
         }
       )
-      .then((Response) => {
-        setMenuItem(Response.data);
-        setItemsForFilter(Response.data);
+      .then((response) => {
+        setMenuItem(response.data);
+        setItemsForFilter(response.data);
         setLoading(false);
+      })
+      .catch((error) => {
+        setError(error.message);
       });
   }, []);
 
-  /*  const filters = ['position', 'location', 'contract', 'tools', 'level']; */
-
-  const filters = ['Junior', 'Midweight', 'Senior'];
-
-  /*  const handleFilter = getJobs.filter((filterItems) => {
-    if (filterItems === btnFilter.name) {
-      return;
-    }
-    return <Filter buttonName={btnFilter.n} />;
-  }); */
-  /*  const allCategories = ['All', ...new Set(jobs.map((item) => item))]; */
-
   const filter = (button: string) => {
-    /*   if (button === 'All') {
-      setMenuItem(jobs);
-      return;
-    } */
+    const lowercaseButton = button.toLowerCase();
 
-    if (levels.includes(button.toLocaleLowerCase())) {
-      const newItems = menuItem;
-      const filteredData = newItems.filter(
-        (item) => item.level.toLowerCase() === button.toLocaleLowerCase()
+    const filteredData = menuItem.filter((item: Job) => {
+      const lowercaseLanguages = item.languages.map((language) =>
+        language.toLowerCase()
       );
 
-      setItemsForFilter(filteredData);
-    }
+      return (
+        item.level.toLowerCase() === lowercaseButton ||
+        lowercaseLanguages.some((language) => language === lowercaseButton)
+      );
+    });
+
+    setItemsForFilter(filteredData);
+    setActiveButton((prevActiveFilters) =>
+      prevActiveFilters.includes(button)
+        ? prevActiveFilters.filter((filter) => filter !== button)
+        : [...prevActiveFilters, button]
+    );
   };
 
+  const removeButton = (buttonValue: string) => {
+    const updatedButtons = activeButton.filter((item) => item !== buttonValue);
+    setActiveButton(updatedButtons);
+  };
   return (
-    <div className='m-4 flex flex-col items-center gap-4'>
-      <div>filter</div>
+    <div className=''>
+      <div className=''>
+        {activeButton.length > 0 && (
+          <ActiveFilters filters={activeButton} onFilterRemove={removeButton} />
+        )}
+      </div>
 
-      <div></div>
-
-      <>
-        <div
-          className='flex flex-wrap justify-between gap-4 rounded border-l-4 border-l-jbprimary
-                 bg-slate-50 p-4 shadow-sm shadow-jbprimary sm:w-full sm:flex-col  md:w-2/3  md:flex-row'
-        >
-          {!loading && itemsForFilter
-            ? itemsForFilter.map((item) => (
-                <GetJobs menuItem={item} key={item.id} filter={filter} />
-              ))
-            : '...Loading'}
-        </div>
-      </>
-
+      <div className='flex flex-wrap items-center justify-center '>
+        {!loading && itemsForFilter
+          ? itemsForFilter.map((item) => (
+              <GetJobs
+                menuItem={item}
+                key={item.id}
+                filter={filter}
+                activeButton={[]}
+              />
+            ))
+          : '...Loading'}
+      </div>
       {error && <p className='text-red-600'>{error}</p>}
     </div>
   );

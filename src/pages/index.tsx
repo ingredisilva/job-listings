@@ -9,12 +9,7 @@ export default function HomePage() {
     <Layout>
       {/* <Seo templateTitle='Home' /> */}
       <Seo />
-
-      <main>
-        <section className='bg-blue-50'>
-          <JobCards />
-        </section>
-      </main>
+      <JobCards />
     </Layout>
   );
 }
