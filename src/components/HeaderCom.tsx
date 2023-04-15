@@ -6,7 +6,7 @@ import React from 'react';
 function Header() {
   return (
     <div className='flex w-full items-center justify-center '>
-      <Image src={BGHeader} alt='header' width={2000} height={156} />
+      <Image src={BGHeader} alt='header' width={2000} />
     </div>
   );
 }
