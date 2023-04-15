@@ -27,11 +27,17 @@ const GetJobs = ({ menuItem, filter, activeButton }: GetJobsProps) => {
   const allButtons = [level, ...languages, ...tools];
 
   return (
-    <div className='layout bg-jbprimary-light shadow-jbprimary-light m-2 flex w-full  gap-4 rounded-lg  border-l-8 border-l-jbprimary bg-slate-50 p-4 shadow-lg sm:flex-grow-0'>
-      <div className='flex w-full flex-wrap items-center justify-between gap-4 sm:p-0 md:p-6'>
-        <div className=''>
+    <div className='layout bg-jbprimary-light shadow-jbprimary-light m-2 flex gap-4  rounded-lg border-l-8  bg-slate-50 p-4 shadow-lg hover:border-l-jbprimary sm:flex-grow-0 md:w-full'>
+      <div className='flex flex-wrap items-center justify-between gap-4 sm:p-0 md:w-full md:p-6'>
+        <div className='ms:-mb-6'>
           {width < 768 ? (
-            <Image src={menuItem.logo} alt={company} width={40} height={40} />
+            <Image
+              src={menuItem.logo}
+              alt={company}
+              width={40}
+              height={40}
+              className=''
+            />
           ) : (
             <Image src={menuItem.logo} alt={company} width={100} height={100} />
           )}
@@ -45,7 +51,7 @@ const GetJobs = ({ menuItem, filter, activeButton }: GetJobsProps) => {
               </span>
             )}
             {featured && (
-              <span className='rounded-full bg-jbprimary py-1 px-2 font-bold text-slate-50'>
+              <span className='rounded-full bg-jbprimary py-1 px-2 font-bold text-slate-50 hover:bg-slate-800'>
                 FEATURED
               </span>
             )}
@@ -58,8 +64,9 @@ const GetJobs = ({ menuItem, filter, activeButton }: GetJobsProps) => {
             <span>&middot;</span>
             <p>{location}</p>
           </div>
+          <hr className='my-4 w-full sm:block md:hidden' />
         </div>
-        <div className='flex-end flex flex-wrap gap-4'>
+        <div className='md:flex-end flex flex-wrap gap-2 sm:items-center  sm:justify-center md:justify-end'>
           {allButtons.map((button) => (
             <Filters
               key={button}
@@ -70,7 +77,6 @@ const GetJobs = ({ menuItem, filter, activeButton }: GetJobsProps) => {
           ))}
         </div>
       </div>
-      <hr className='my-4' />
     </div>
   );
 };

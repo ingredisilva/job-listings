@@ -32,7 +32,7 @@ export interface Job {
 const Jobs: Job[] = [];
 
 const levels = ['junior', 'midweight', 'senior'];
-const langs = ['javascript', 'python', 'css', 'scss'];
+const langs = ['javascript', 'python', 'css', 'scss', 'react'];
 interface ActiveFiltersProps {
   filters: string[];
   onFilterRemove: (filter: string) => void;
