@@ -1,3 +1,4 @@
+import { useWindowSize } from 'hooks/useWindowSize';
 import Image from 'next/image';
 
 import Filters from '@/components/Filter';
@@ -22,14 +23,18 @@ const GetJobs = ({ menuItem, filter, activeButton }: GetJobsProps) => {
     languages,
     tools,
   } = menuItem;
-
+  const { width } = useWindowSize();
   const allButtons = [level, ...languages, ...tools];
 
   return (
     <div className='layout bg-jbprimary-light shadow-jbprimary-light m-2 flex w-full  gap-4 rounded-lg  border-l-8 border-l-jbprimary bg-slate-50 p-4 shadow-lg sm:flex-grow-0'>
-      <div className='flex w-full flex-wrap items-center justify-between gap-4 p-6'>
-        <div className='flex-shrink-0'>
-          <Image src={menuItem.logo} alt={company} width={100} height={100} />
+      <div className='flex w-full flex-wrap items-center justify-between gap-4 sm:p-0 md:p-6'>
+        <div className=''>
+          {width < 768 ? (
+            <Image src={menuItem.logo} alt={company} width={40} height={40} />
+          ) : (
+            <Image src={menuItem.logo} alt={company} width={100} height={100} />
+          )}
         </div>
         <div className='flex-grow'>
           <div className='flex items-center gap-4'>

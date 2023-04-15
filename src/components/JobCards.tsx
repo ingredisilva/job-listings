@@ -32,7 +32,7 @@ export interface Job {
 const Jobs: Job[] = [];
 
 const levels = ['junior', 'midweight', 'senior'];
-const langs = ['javascript', 'python', 'css'];
+const langs = ['javascript', 'python', 'css', 'scss'];
 interface ActiveFiltersProps {
   filters: string[];
   onFilterRemove: (filter: string) => void;
@@ -45,15 +45,15 @@ const ActiveFilters = ({ filters, onFilterRemove }: ActiveFiltersProps) => {
 
   return (
     <div className='layout relative top-[-22px] flex w-full justify-between rounded-lg border border-primary-50 bg-slate-50 p-4 shadow-lg'>
-      <div className='mx-4 flex flex-wrap gap-4'>
+      <div className='mx-4 flex flex-wrap gap-4 p-2'>
         {filters.map((filter) => (
           <button
             key={filter}
-            className='flex items-center gap-2 rounded bg-green-50 p-2 font-bold text-teal-200'
+            className='flex items-center gap-2 rounded bg-green-50 font-bold text-jbprimary'
             onClick={() => handleFilterRemove(filter)}
           >
             <span>{filter}</span>
-            <span className='flex h-full w-full items-center rounded-r bg-[#5CA5A5]'>
+            <span className='flex h-full w-4 items-center justify-center rounded-r bg-[#5CA5A5] text-white'>
               x
             </span>
           </button>
@@ -61,7 +61,7 @@ const ActiveFilters = ({ filters, onFilterRemove }: ActiveFiltersProps) => {
       </div>
       <button
         className='font-bold hover:underline'
-        onClick={() => handleFilterRemove}
+        onClick={() => onFilterRemove(filters[0])}
       >
         Limpar
       </button>
@@ -121,7 +121,11 @@ function JobCards() {
   const removeButton = (buttonValue: string) => {
     const updatedButtons = activeButton.filter((item) => item !== buttonValue);
     setActiveButton(updatedButtons);
+    if (updatedButtons.length === 0) {
+      setItemsForFilter(menuItem);
+    }
   };
+
   return (
     <div className=''>
       <div className=''>
